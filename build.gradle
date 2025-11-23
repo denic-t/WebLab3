@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'org.denic_t'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // WildFly уже поставляет полный стек Jakarta EE (Servlet, JSF, CDI, JSP, JSTL)
+    // Подключаем весь web API как provided (не упаковываем в WAR)
+    providedCompile 'jakarta.platform:jakarta.jakartaee-web-api:10.0.0'
+
+    // PostgreSQL JDBC Driver
+    implementation 'org.postgresql:postgresql:42.7.2'
+    
+    // Gson для JSON обработки (если потребуется)
+
+
+    // PrimeFaces для p:spinner и других компонентов
+    implementation 'org.primefaces:primefaces:13.0.2:jakarta'
+
+    // Для тестирования
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Настройка WAR архива
+war {
+    archiveFileName = 'WebLab3.war'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    
+
+}

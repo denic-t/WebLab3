@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee 
+                             https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    
+    <!-- Имя и описание приложения -->
+    <display-name>WebLab3</display-name>
+    <description>Лабораторная работа №3 - JSF и Facelets</description>
+
+    <!-- Настройка сервлетов -->
+
+    <!-- JSF FacesServlet -->
+
+    <servlet>
+        <servlet-name>FacesServlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- Обрабатываем все .xhtml через JSF -->
+    <servlet-mapping>
+        <servlet-name>FacesServlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+
+    <!-- Главная страница - стартовый JSF-экран -->
+    <welcome-file-list>
+        <welcome-file>start.xhtml</welcome-file>
+    </welcome-file-list>
+
+    <!-- MIME типы -->
+    <mime-mapping>
+        <extension>css</extension>
+        <mime-type>text/css</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>js</extension>
+        <mime-type>application/javascript</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>png</extension>
+        <mime-type>image/png</mime-type>
+    </mime-mapping>
+
+    <mime-mapping>
+        <extension>jpg</extension>
+        <mime-type>image/jpeg</mime-type>
+    </mime-mapping>
+
+    <context-param>
+        <param-name>developer</param-name>
+        <param-value>Ткачев Денис Владимирович</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>group</param-name>
+        <param-value>P3211</param-value>
+    </context-param>
+
+    <context-param>
+        <param-name>variant</param-name>
+        <param-value>17010</param-value>
+    </context-param>
+
+</web-app>

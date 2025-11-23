@@ -1,0 +1,440 @@
+/* Общие стили и наследование */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eef1f5;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    background-image: url("../img/backround.jpg");
+}
+
+/* --- Шапка (требования по стилизации) --- */
+/* Селектор идентификатора (#main-header) */
+#main-header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+/* Селектор потомка (#main-header h1) и стили для ФИО */
+#main-header h1 {
+    font-family: fantasy, cursive; /* Требуемый шрифт */
+    color: #f1c40f;               /* Требуемый цвет */
+    font-size: 2.8em;             /* Требуемый размер */
+    margin: 0;
+}
+
+/* --- Основной контент --- */
+main {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+/* Селектор дочерних элементов (main > .container) */
+main > .container {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 400px;
+}
+
+/* --- Форма --- */
+.input-group {
+    margin-bottom: 25px; /* Отступы в пикселях */
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px; /* Отступы в пикселях */
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 95%;
+    padding: 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Стили для checkbox группы X */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 8px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 5px 10px;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.checkbox-label:hover {
+    background-color: #ecf0f1;
+    border-color: #3498db;
+}
+
+.checkbox-label input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+.checkbox-label input[type="checkbox"]:checked + span {
+    font-weight: bold;
+    color: #3498db;
+}
+
+.checkbox-label span {
+    margin-left: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #2980b9;
+}
+
+button:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* --- Таблица результатов --- */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.results-table th, .results-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: center;
+}
+
+.results-table thead {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+.results-table tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Результат проверки */
+.results-table .hit {
+    background-color: #2ecc71;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.results-table .miss {
+    background-color: #e74c3c;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+/* Стили для результат страницы (AreaCheckServlet) */
+.result-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.result-table th, .result-table td {
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: center;
+}
+
+.result-table thead {
+    background-color: #34495e;
+    color: #ffffff;
+}
+
+.result-table .hit {
+    background-color: #2ecc71;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+.result-table .miss {
+    background-color: #e74c3c;
+    color: #ffffff;
+    font-weight: bold;
+    border-radius: 4px;
+}
+
+/* --- Сообщения об ошибках --- */
+.error-message {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-top: 5px;
+    font-size: 0.9em;
+    display: none;
+}
+
+.error-message:not(:empty) {
+    display: block;
+}
+
+.server-error {
+    background-color: #fdecea;
+    border: 1px solid #f5c6cb;
+    color: #c0392b;
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+/* --- Модальное окно обратной связи --- */
+.feedback-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 900;
+}
+
+.feedback-backdrop.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.feedback-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    min-width: 280px;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 950;
+}
+
+.feedback-modal.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.feedback-modal__content {
+    padding: 28px 32px 24px;
+    text-align: center;
+}
+
+.feedback-modal__title {
+    margin: 0 0 12px;
+    font-size: 1.5em;
+}
+
+.feedback-modal__message {
+    margin: 0 0 24px;
+    font-size: 1.05em;
+    line-height: 1.4;
+}
+
+.feedback-modal__details {
+    margin: 0 0 24px;
+    display: none;
+    overflow-x: auto;
+}
+
+.feedback-modal__details.visible {
+    display: block;
+}
+
+.feedback-modal__details-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+}
+
+.feedback-modal__details-table th,
+.feedback-modal__details-table td {
+    border: 1px solid #e1e5ea;
+    padding: 8px;
+    text-align: center;
+    word-break: break-word;
+}
+
+.feedback-modal__details-table .result-cell--hit {
+    background-color: #2ecc71;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.feedback-modal__details-table .result-cell--miss {
+    background-color: #e74c3c;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.feedback-modal__details-table thead {
+    background-color: #f4f6f8;
+    font-weight: 600;
+}
+
+.feedback-modal__button {
+    min-width: 120px;
+    padding: 10px 18px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+
+.feedback-modal__button:hover,
+.feedback-modal__button:focus {
+    background-color: #217dbb;
+    outline: none;
+}
+
+.feedback-modal--success .feedback-modal__title {
+    color: #2ecc71;
+}
+
+.feedback-modal--error .feedback-modal__title {
+    color: #e74c3c;
+}
+
+.feedback-modal__title--hit {
+    color: #2ecc71;
+}
+
+.feedback-modal__title--miss {
+    color: #e74c3c;
+}
+
+/* --- Стили для SVG-графика --- */
+#plot-container {
+    text-align: center;
+}
+
+.plot-wrapper {
+    display: inline-block;
+    margin: 20px 0;
+}
+
+#plot {
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    background-color: #fdfdfd;
+    cursor: crosshair;
+}
+
+.area-shape {
+    fill: #3498db; /* Цвет закрашенной области */
+    fill-opacity: 0.7;
+    stroke: #2980b9;
+    stroke-width: 1;
+}
+
+.axis {
+    stroke: #000000;
+    stroke-width: 2;
+}
+
+.axis-labels {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    fill: #000;
+    user-select: none;
+}
+
+.axis-marks {
+    stroke: #000000;
+    stroke-width: 1.5;
+}
+
+/* Стили для точек результатов */
+#result-points circle {
+    transition: r 0.3s ease;
+}
+
+#result-points circle:hover {
+    r: 5;
+}
+
+/* --- Навигация --- */
+.navigation {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.back-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #95a5a6;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.back-link:hover {
+    background-color: #7f8c8d;
+}
+
+/* --- Адаптивность --- */
+@media (max-width: 768px) {
+    main {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    main > .container {
+        min-width: auto;
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    .checkbox-group {
+        justify-content: center;
+    }
+    
+    #plot {
+        max-width: 100%;
+        height: auto;
+    }
+}

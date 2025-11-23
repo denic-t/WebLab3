@@ -1,0 +1,133 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui" template="/template.xhtml">
+    <ui:define name="title">Web Lab 3 - Main</ui:define>
+
+    <ui:define name="head">
+        <script type="module" src="#{request.contextPath}/resources/js/canvas-setup.js"></script>
+        <script type="module" src="#{request.contextPath}/resources/js/main.js"></script>
+        <script type="text/javascript">
+            // Canvas initialization is handled in main.js
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <!-- Form Container -->
+        <div class="container" id="input-form">
+            <h2>Проверка попадания точки в область</h2>
+
+            <h:form id="coordinates-form">
+                <!-- X Selection (Radio Buttons) -->
+                <div class="input-group">
+                    <label>Координата X:</label>
+                    <div class="radio-group">
+                        <h:selectOneRadio value="#{xCoordinateBean.x}" layout="lineDirection">
+                            <f:selectItem itemValue="-3" itemLabel="-3" />
+                            <f:selectItem itemValue="-2" itemLabel="-2" />
+                            <f:selectItem itemValue="-1" itemLabel="-1" />
+                            <f:selectItem itemValue="0" itemLabel="0" />
+                            <f:selectItem itemValue="1" itemLabel="1" />
+                            <f:selectItem itemValue="2" itemLabel="2" />
+                            <f:selectItem itemValue="3" itemLabel="3" />
+                            <f:selectItem itemValue="4" itemLabel="4" />
+                            <f:selectItem itemValue="5" itemLabel="5" />
+                            <f:ajax render="@form" />
+                        </h:selectOneRadio>
+                    </div>
+                </div>
+
+                <!-- Y Input (Text) -->
+                <div class="input-group">
+                    <label for="y-input">Координата Y (-5 ... 5):</label>
+                    <h:inputText id="y-input" value="#{yCoordinateBean.y}" converter="commaToDotConverter"
+                        style="width: 95%; padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px;">
+                        <f:validateDoubleRange minimum="-5" maximum="5" />
+                    </h:inputText>
+                    <h:message for="y-input" styleClass="error-message" />
+                </div>
+
+                <!-- R Input (Spinner) -->
+                <div class="input-group">
+                    <label for="r-input">Радиус R (1 ... 3):</label>
+                    <p:spinner id="r-input" value="#{rCoordinateBean.r}" min="1" max="3" stepFactor="0.5"
+                        widgetVar="rSpinner" onchange="updateCanvasR(this.value)">
+                        <p:ajax process="@this" update="@this" oncomplete="updateCanvas(PF('rSpinner').getValue())" />
+                    </p:spinner>
+                    <h:message for="r-input" styleClass="error-message" />
+                </div>
+
+                <!-- Submit Button -->
+                <h:commandButton value="Проверить" styleClass="submit-btn"
+                    style="width: 100%; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1em;">
+                    <f:ajax execute="@form"
+                        listener="#{resultsControllerBean.addResult(xCoordinateBean.x, yCoordinateBean.y, rCoordinateBean.r)}"
+                        render="@form results-table-container" />
+                </h:commandButton>
+            </h:form>
+        </div>
+
+        <!-- Graph Container -->
+        <div class="container" id="plot-container" style="text-align: center;">
+            <h2>График области</h2>
+            <div class="plot-wrapper"
+                style="display: inline-block; margin: 20px 0; border: 1px solid #bdc3c7; border-radius: 8px; background-color: #fdfdfd;">
+                <!-- Canvas for Graph -->
+                <canvas id="graphCanvas" width="400" height="400" style="cursor: crosshair;"></canvas>
+            </div>
+        </div>
+
+        <!-- Results Table -->
+        <h:panelGroup layout="block" styleClass="container" id="results-table-container">
+            <h2>История проверок</h2>
+            <h:dataTable value="#{resultsControllerBean.results}" var="res" styleClass="results-table"
+                headerClass="results-table-header" rowClasses="results-table-row">
+                <h:column>
+                    <f:facet name="header">X</f:facet>
+                    #{res.x}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Y</f:facet>
+                    #{res.y}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">R</f:facet>
+                    #{res.r}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Результат</f:facet>
+                    <span class="#{res.result ? 'hit' : 'miss'}">
+                        #{res.result ? 'Попадание' : 'Промах'}
+                    </span>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Время</f:facet>
+                    #{res.formattedTimestamp}
+                </h:column>
+            </h:dataTable>
+        </h:panelGroup>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <h:link outcome="goToIndex" styleClass="back-link">
+                Вернуться на стартовую
+            </h:link>
+        </div>
+
+        <!-- Command Script for Graph Click -->
+        <h:form>
+            <h:commandScript name="addPointScript" action="#{resultsControllerBean.addResultRemote}"
+                render=":results-table-container :coordinates-form:y-input :coordinates-form:r-input" />
+        </h:form>
+
+        <!-- Hidden form for canvas update -->
+        <h:form id="update-radius" style="display:none;">
+            <h:inputHidden id="radius" value="#{rCoordinateBean.r}" />
+            <h:commandButton id="updateCanvas">
+                <f:ajax execute="@form" listener="#{resultsControllerBean.updateCanvas(rCoordinateBean.r)}"
+                    render="@form results-table-container" />
+            </h:commandButton>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>
