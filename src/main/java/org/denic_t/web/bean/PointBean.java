@@ -19,6 +19,7 @@ public class PointBean {
     private Double y;
     private Double r;
 
+    
     @Inject
     private ResultsBean resultsBean;
 

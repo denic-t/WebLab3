@@ -161,15 +161,30 @@ export function attachCanvasListeners() {
     });
 }
 
+window.handlePointAddedFromServer = function() {
+    if (!window.lastClickedPoint) {
+        console.warn("No lastClickedPoint found");
+        return;
+    }
+    const {x, y, r} = window.lastClickedPoint;
+
+    window.drawDotOnCanvas(x, y, r, undefined, true);
+}
+
 window.sendCoords = function sendCoords(x, y) {
     let rInput = document.getElementById('coordinates-form:r-input_input');
     let r = rInput ? rInput.value : 1;
+    r = ("" + r).replace(',', '.');
 
     console.log("Sending coords via commandScript:", x, y, r);
-    // alert("Click detected! Sending: " + x + ", " + y + ", " + r); // Debug alert
-
+    window.lastClickedPoint = { x, y, r }; // For potential future use
+    // Передаём параметры x, y, r так, чтобы PrimeFaces remoteCommand создал request parameters
     if (typeof addPointScript === 'function') {
-        addPointScript({ x: x, y: y, r: r });
+        addPointScript([
+            { name: 'x', value: x },
+            { name: 'y', value: y },
+            { name: 'r', value: r }
+        ]);
     } else {
         console.error("addPointScript function is not defined!");
         alert("Error: addPointScript is not defined. Check console.");

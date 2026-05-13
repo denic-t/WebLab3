@@ -1,14 +1,16 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:f="http://xmlns.jcp.org/jsf/core"
     xmlns:p="http://primefaces.org/ui" template="/template.xhtml">
-    <ui:define name="title">Web Lab 3 - Main</ui:define>
+    <ui:define name="title">WebLab 3 - Main</ui:define>
 
     <ui:define name="head">
+<!--        <h:outputScript library="js" name="canvas-setup.js" target="body" />-->
+<!--        <h:outputScript library="js" name="main.js" target="body" />-->
         <script type="module" src="#{request.contextPath}/resources/js/canvas-setup.js"></script>
         <script type="module" src="#{request.contextPath}/resources/js/main.js"></script>
-        <script type="text/javascript">
-            // Canvas initialization is handled in main.js
-        </script>
+<!--        <script type="text/javascript">-->
+<!--            // Canvas initialization is handled in main.js-->
+<!--        </script>-->
     </ui:define>
 
     <ui:define name="content">
@@ -115,8 +117,9 @@
 
         <!-- Command Script for Graph Click -->
         <h:form>
-            <h:commandScript name="addPointScript" action="#{resultsControllerBean.addResultRemote}"
-                render=":results-table-container :coordinates-form:y-input :coordinates-form:r-input" />
+            <p:remoteCommand name="addPointScript"
+                             action="#{resultsControllerBean.addResultRemote}"
+                             update=":results-table-container :coordinates-form"/>
         </h:form>
 
         <!-- Hidden form for canvas update -->

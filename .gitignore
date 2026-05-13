@@ -37,6 +37,7 @@ bin/
 
 ### VS Code ###
 .vscode/
+*.bat
 
 ### Mac OS ###
 .DS_Store
