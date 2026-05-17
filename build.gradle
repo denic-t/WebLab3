@@ -29,9 +29,11 @@ dependencies {
     // PrimeFaces для p:spinner и других компонентов
     implementation 'org.primefaces:primefaces:13.0.2:jakarta'
 
-    // Для тестирования
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Для тестирования (указываем IDE брать jar файлы из папки libs)
+    testImplementation fileTree(dir: 'libs', include: ['*.jar'])
+    
+    // Либо можно указать классический JUnit 4 напрямую для IDE:
+    // testImplementation 'junit:junit:4.12'
 }
 
 test {
@@ -42,6 +44,77 @@ test {
 war {
     archiveFileName = 'WebLab3.war'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    
+}
 
+// Пользовательская задача "history" для отката ревизий
+task history {
+    doLast {
+        println "==== Запуск задачи history ===="
+
+        // 1. Сохраняем имя текущей ветки или текущий коммит, чтобы в конце вернуть репозиторий в исходное состояние
+        def currentBranch = "git rev-parse --abbrev-ref HEAD".execute().text.trim()
+        if (currentBranch == "HEAD") {
+            currentBranch = "git rev-parse HEAD".execute().text.trim()
+        }
+
+        // 2. Получаем список хэшей всех коммитов от нового к старому
+        def logProcess = "git log --format=%H".execute()
+        def commits = logProcess.text.trim().readLines()
+
+        if (commits.isEmpty()) {
+            println "Репозиторий git пуст или не инициализирован."
+            return
+        }
+
+        String lastFailedCommit = null
+        boolean compiledSuccessfully = false
+
+        // 3. Проходим циклом по каждому коммиту
+        for (int i = 0; i < commits.size(); i++) {
+            String commit = commits[i]
+            println "Проверяем ревизию: ${commit}"
+
+            // 4. Переключаем исходный код на выбранный коммит
+            "git checkout ${commit}".execute().waitFor()
+
+            // 5. Пытаемся скомпилировать проект. Вызываем сборку в отдельном процессе Windows
+            def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+            def cmd = isWindows ? ["cmd.exe", "/c", "gradlew.bat", "compileJava"] : ["./gradlew", "compileJava"]
+            
+            def buildProcess = new ProcessBuilder(cmd).redirectErrorStream(true).start()
+            buildProcess.waitFor() // Ждем завершения компиляции
+
+            // 6. Проверяем код возврата компиляции (0 - успешно, иначе - ошибка)
+            if (buildProcess.exitValue() == 0) {
+                println "Успешно! Ревизия ${commit} скомпилировалась без ошибок."
+                compiledSuccessfully = true
+
+                // 7. Если у нас есть сломанный коммит (предыдущая итерация), то формируем diff между ним и текущим рабочим
+                if (lastFailedCommit != null) {
+                    println "Создаем файл diff между рабочей ревизией (${commit}) и сломанной (${lastFailedCommit})..."
+                    def diffProcess = "git diff ${commit} ${lastFailedCommit}".execute()
+                    // 8. Сохраняем результат операции diff для всех файлов в diff_history.txt
+                    file("diff_history.txt").text = diffProcess.text
+                    println "Diff успешно сохранён в diff_history.txt"
+                } else {
+                    println "Это самая первая (последняя по времени) ревизия, и она работает. Файл diff формировать не с чем."
+                }
+                
+                // Цель достигнута, выходим из цикла
+                break
+            } else {
+                println "Ошибка компиляции на ревизии ${commit}."
+                // 9. Запоминаем текущий коммит как "последний сломанный", чтобы сформировать с ним diff на следующей итерации
+                lastFailedCommit = commit
+            }
+        }
+
+        if (!compiledSuccessfully) {
+            println "Не удалось найти ни одну рабочую ревизию (даже первую)."
+        }
+
+        // 10. Возвращаем репозиторий на ту ветку/коммит, где мы находились до запуска скрипта
+        println "Возврат репозитория в исходное состояние (${currentBranch})..."
+        "git checkout ${currentBranch}".execute().waitFor()
+    }
 }

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="WebLab3" default="build" basedir=".">
+
+    <!-- Загрузка параметров -->
+    <property file="build.properties"/>
+
+    <!-- Подключение ant-contrib для использования циклов и try-catch -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <fileset dir="${lib.dir}" includes="ant-contrib-*.jar"/>
+        </classpath>
+    </taskdef>
+
+    <path id="classpath">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+    </path>
+
+    <path id="classpath.test">
+        <path refid="classpath"/>
+        <pathelement location="${classes.dir}"/>
+    </path>
+
+    <!-- 3. clean - удаление скомпилированных классов проекта и временных файлов -->
+    <target name="clean" description="Удаление скомпилированных классов и временных файлов">
+        <echo message="***** CLEAN STARTED *****"/>
+        <!-- Удаляем только файлы Ant, чтобы не стереть папку libs с WAR-архивом, сгенерированным Gradle -->
+        <delete dir="${classes.dir}"/>
+        <delete dir="${test.classes.dir}"/>
+        <delete file="${build.dir}/${project.name}.jar"/>
+        <delete file="${diff.file}"/>
+        <echo message="***** CLEAN COMPLETED *****"/>
+    </target>
+
+    <!-- 1. compile - компиляция исходных кодов проекта -->
+    <target name="compile" depends="clean" description="Компиляция исходных кодов проекта">
+        <echo message="***** COMPILE STARTED *****"/>
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" encoding="utf-8">
+            <classpath refid="classpath"/>
+        </javac>
+        <copy todir="${classes.dir}">
+            <fileset dir="${resources.dir}" erroronmissingdir="false"/>
+        </copy>
+        <echo message="***** COMPILE COMPLETED *****"/>
+    </target>
+
+    <!-- 2. build - компиляция исходных кодов проекта и их упаковка в jar-архив -->
+    <target name="build" depends="compile" description="Компиляция и упаковка в исполняемый jar-архив">
+        <echo message="***** BUILD STARTED *****"/>
+
+        <echo message="Сборка WebLab3.war через Gradle..."/>
+        <exec executable="cmd.exe" failonerror="true">
+            <arg value="/c"/>
+            <arg value="gradlew.bat"/>
+            <arg value="war"/>
+        </exec>
+
+        <echo message="Упаковка классов и WebLab3.war в единый исполняемый ${project.name}.jar..."/>
+        <jar destfile="${build.dir}/${project.name}.jar" manifest="MANIFEST.MF">
+            <fileset dir="${classes.dir}"/>
+            <!-- Кладем war-файл прямо в корень создаваемого jar. -->
+            <fileset dir="build/libs" includes="${project.name}.war" erroronmissingdir="false"/>
+        </jar>
+
+        <echo message="JAR-файл собран. Для ручного запуска сервера используйте команду: java -jar ${build.dir}/${project.name}.jar"/>
+
+        <echo message="***** BUILD COMPLETED *****"/>
+    </target>
+
+    <!-- 4. test - запуск junit-тестов проекта -->
+    <target name="test" depends="build" description="Запуск junit-тестов проекта">
+        <echo message="***** TEST STARTED *****"/>
+        <mkdir dir="${test.classes.dir}"/>
+        <javac srcdir="${test.dir}" destdir="${test.classes.dir}" includeantruntime="false" encoding="utf-8">
+            <classpath refid="classpath.test"/>
+        </javac>
+        <junit printsummary="on" haltonfailure="true" haltonerror="true" fork="yes">
+            <classpath>
+                <path refid="classpath.test"/>
+                <pathelement location="${test.classes.dir}"/>
+            </classpath>
+            <formatter type="plain" usefile="false"/>
+            <batchtest>
+                <fileset dir="${test.dir}" includes="**/*Test.java"/>
+            </batchtest>
+        </junit>
+        <echo message="***** TEST COMPLETED *****"/>
+    </target>
+
+    <!-- 5. music - воспроизведение музыки по завершению сборки -->
+    <target name="music" depends="build" description="Воспроизведение музыки по завершению сборки">
+        <echo message="***** MUSIC PLAYING *****"/>
+        <sound>
+            <success source="${music.file}"/>
+            <fail source="${music.file}"/>
+        </sound>
+        <!-- Ant sound task воспроизводит звук в фоне, echo просто сигнализирует -->
+        <echo message="Music is playing..."/>
+    </target>
+
+    <!-- 6. history - откат ревизий git, пока проект не соберется -->
+    <target name="history" description="Запуск задачи Gradle для поиска рабочей ревизии git и создания diff">
+        <echo message="***** HISTORY STARTED *****"/>
+        
+        <echo message="Делегирование задачи history инструменту Gradle..."/>
+        <exec executable="cmd.exe" failonerror="true">
+            <arg value="/c"/>
+            <arg value="gradlew.bat"/>
+            <arg value="history"/>
+        </exec>
+        
+        <echo message="***** HISTORY COMPLETED *****"/>
+    </target>
+
+</project>
